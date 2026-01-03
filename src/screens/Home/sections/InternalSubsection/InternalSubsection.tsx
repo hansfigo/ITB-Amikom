@@ -2,6 +2,7 @@ import { ChevronDownIcon } from "lucide-react";
 import React from "react";
 import { Badge } from "../../../../components/ui/badge";
 import { Card, CardContent } from "../../../../components/ui/card";
+import { useAuth } from "../../../../context/AuthContext";
 
 const educationLevels = [
   {
@@ -116,6 +117,12 @@ const DecorativeBackground = () => (
 );
 
 export const InternalSubsection = (): JSX.Element => {
+  const { user } = useAuth();
+
+  if (user) {
+    return <></>;
+  }
+
   return (
     <section className="w-full bg-white py-[60px]">
       <div className="flex flex-col items-center gap-12 container mx-auto px-4">

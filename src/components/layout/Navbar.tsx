@@ -1,7 +1,8 @@
 import { ChevronDownIcon, LogOut, User } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const topNavLinks = [{ label: "Berita dan Acara", link: "/news" }, { label: "Hubungi Kami", link: "/contact" }];
 
@@ -11,13 +12,23 @@ const mainNavItems = [
   { label: "Kemahasiswaan", hasDropdown: true },
 ];
 
-const programDropdownData = {
+type ProgramDropdown = {
+  title: string;
+  description: string;
+  programs: {
+    xyz: string[];
+    international: string[];
+  };
+  link: string;
+};
+
+const programDropdownData: Record<string, ProgramDropdown> = {
   sarjana: {
     title: "Sarjana",
     description: "Jenjang pendidikan awal bagi lulusan sekolah menengah atas, ditempuh dalam waktu 4 tahun.",
     programs: {
       xyz: ["spesialisasi", "minor", "double-major", "multidisiplin"],
-      international: ["students-exchange", "double-major", "summer-school"]
+      international: [],
     },
     link: "/programs/sarjana/spesialisasi"
   },
@@ -25,8 +36,8 @@ const programDropdownData = {
     title: "Pascasarjana",
     description: "Jenjang pendidikan lanjutan yang mencakup program magister (2 tahun) dan doktor (3 tahun).",
     programs: {
-      xyz: ["Multidisiplin"],
-      international: ["Students Exchange", "Double Major", "Summer School"]
+      xyz: ["minor", "multidisiplin"],
+      international: [],
     },
     link: "/programs/pascasarjana/multidisiplin"
   },
@@ -35,7 +46,7 @@ const programDropdownData = {
     description: "Jenjang pendidikan tinggi yang berfokus pada keahlian khusus setelah sarjana.",
     programs: {
       xyz: [],
-      international: []
+      international: [],
     },
     link: "/"
   }
@@ -50,6 +61,8 @@ export const Navbar = (): JSX.Element => {
   const [isLangOpen, setIsLangOpen] = useState(false);
   const quickLinksRef = useRef<HTMLDivElement | null>(null);
   const [quickLinksPos, setQuickLinksPos] = useState<{ left: number; top: number } | null>(null);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const calculateQuickLinksPos = () => {
     const el = quickLinksRef.current;
@@ -88,6 +101,12 @@ export const Navbar = (): JSX.Element => {
       window.removeEventListener("scroll", onResize, true);
     };
   }, [isQuickLinksOpen]);
+
+  useEffect(() => {
+    if (!user) {
+      setIsProfileOpen(false);
+    }
+  }, [user]);
 
   // Portal renderer for quick links
   const QuickLinksPortal = ({ pos }: { pos: { left: number; top: number } | null }) => {
@@ -135,6 +154,12 @@ export const Navbar = (): JSX.Element => {
     setIsProfileOpen(false);
     setIsQuickLinksOpen(false);
     setIsLangOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    closeAll();
+    navigate("/");
   };
 
   return (
@@ -372,55 +397,67 @@ export const Navbar = (): JSX.Element => {
               </div>
 
               <div className="inline-flex items-center justify-end gap-3">
-                <div className="inline-flex items-center justify-end gap-4">
-                  {/* Profile Section */}
-                  <div className="relative">
-                    <button className="flex items-center gap-3 hover:opacity-80 transition-opacity" onClick={() => {
-                      // close quick links & lang when opening profile to avoid overlap
-                      setIsQuickLinksOpen(false);
-                      setIsLangOpen(false);
-                      setIsProfileOpen(!isProfileOpen);
-                      setIsProgramDropdownOpen(false);
-                      setIsAkademikOpen(false);
-                      setIsKemahasiswaanOpen(false);
-                    }}>
-                      <img
-                        src="/frame-427322943-1.png"
-                        alt="Profile"
-                        className="w-10 h-10 rounded-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const fallback = document.createElement('div');
-                          fallback.className = 'w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center';
-                          fallback.innerHTML = '<span class="text-gray-600 font-semibold text-sm">IM</span>';
-                          target.parentElement?.appendChild(fallback);
-                        }}
-                      />
+                {!user && (
+                  <Link
+                    to="/login"
+                    className="rounded-full border border-[#069dd8] text-[#069dd8] px-5 py-2 font-medium hover:bg-[#069dd8]/10 transition-colors"
+                    onClick={closeAll}
+                  >
+                    Login
+                  </Link>
+                )}
 
-                      <div className="flex flex-col items-start">
-                        <div className="font-semibold text-[#333333] text-sm">Ismail Mail</div>
-                        <div className="text-xs text-[#808080]">FTSL/Teknik Kelautan</div>
-                      </div>
-                    </button>
+                {user && (
+                  <div className="inline-flex items-center justify-end gap-4">
+                    {/* Profile Section */}
+                    <div className="relative">
+                      <button className="flex items-center gap-3 hover:opacity-80 transition-opacity" onClick={() => {
+                        // close quick links & lang when opening profile to avoid overlap
+                        setIsQuickLinksOpen(false);
+                        setIsLangOpen(false);
+                        setIsProfileOpen(!isProfileOpen);
+                        setIsProgramDropdownOpen(false);
+                        setIsAkademikOpen(false);
+                        setIsKemahasiswaanOpen(false);
+                      }}>
+                        <img
+                          src="/frame-427322943-1.png"
+                          alt="Profile"
+                          className="w-10 h-10 rounded-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = document.createElement('div');
+                            fallback.className = 'w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center';
+                            fallback.innerHTML = '<span class="text-gray-600 font-semibold text-sm">IM</span>';
+                            target.parentElement?.appendChild(fallback);
+                          }}
+                        />
 
-                    {isProfileOpen && (
-                      <div className="absolute right-0 mt-3 z-50">
-                        <div className="bg-white rounded-xl shadow-md p-3 w-44 border border-gray-100">
-                          <Link to="/profile" onClick={closeAll} className="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50">
-                            <User className="w-4 h-4 text-gray-600" />
-                            <span className="text-sm text-gray-700 hover:text-brand transition-colors">Profil Saya</span>
-                          </Link>
-
-                          <button onClick={() => { /* TODO: logout handler */ closeAll(); }} className="w-full text-left flex items-center gap-2 px-2 py-2 mt-1 rounded hover:bg-red-50">
-                            <LogOut className="w-4 h-4 text-red-600" />
-                            <span className="text-sm text-red-600">Keluar</span>
-                          </button>
+                        <div className="flex flex-col items-start">
+                          <div className="font-semibold text-[#333333] text-sm">{user.name}</div>
+                          <div className="text-xs text-[#808080]">{user.major}</div>
                         </div>
-                      </div>
-                    )}
+                      </button>
+
+                      {isProfileOpen && (
+                        <div className="absolute right-0 mt-3 z-50">
+                          <div className="bg-white rounded-xl shadow-md p-3 w-44 border border-gray-100">
+                            <Link to="/profile" onClick={closeAll} className="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50">
+                              <User className="w-4 h-4 text-gray-600" />
+                              <span className="text-sm text-gray-700 hover:text-brand transition-colors">Profil Saya</span>
+                            </Link>
+
+                            <button onClick={() => handleLogout()} className="w-full text-left flex items-center gap-2 px-2 py-2 mt-1 rounded hover:bg-red-50">
+                              <LogOut className="w-4 h-4 text-red-600" />
+                              <span className="text-sm text-red-600">Keluar</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

@@ -39,8 +39,8 @@ const studyPrograms = [
 // from `programFilter` later so existing render code doesn't need changes.
 const programsByType: Record<string, Array<{ title: string; faculty: string; department?: string, slug? : string }>> = {
   "spesialisasi": [
-    { title: "Struktur Lepas Pantai", faculty: "FKampus XYZ", department: "Meteorologi", slug: "struktur-lepas-pantai" },
-    { title: "Teknik Pantai dan Kawasan Pesisi", faculty: "FKampus XYZ", department: "Meteorologi" },
+    { title: "Struktur Lepas Pantai", faculty: "FTSL", department: "Teknik Kelautan", slug: "struktur-lepas-pantai" },
+    { title: "Teknik Pantai dan Kawasan Pesisir", faculty: "FKampus XYZ", department: "Meteorologi" },
     { title: "Pelabuhan, Transportasi Laut dan Logistik", faculty: "FKampus XYZ", department: "Meteorologi" },
     { title: "Lingkungan Laut, Reklamasi dan Pengerukan", faculty: "FKampus XYZ", department: "Meteorologi" },
     { title: "Teknik Geodesi Terapan", faculty: "FKampus XYZ", department: "Teknik Geodesi dan Geomatika" },
