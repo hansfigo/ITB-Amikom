@@ -14,6 +14,7 @@ import { Profile } from "./screens/Profile";
 import { ProgramDetail } from "./screens/ProgramDetail/ProgramDetail";
 import { ProgramList } from "./screens/ProgramList";
 import { Terms } from "./screens/Terms";
+import { NotificationDetail } from "./screens/NotificationDetail";
 import { AuthProvider } from "./context/AuthContext";
 
 createRoot(document.getElementById("app") as HTMLElement).render(
@@ -28,6 +29,7 @@ createRoot(document.getElementById("app") as HTMLElement).render(
           <Route path="/programs/:programName/:programType/:programSlug" element={<ProgramDetail />} />
           <Route path="/programs/:programName/:programType/:programSlug/apply" element={<ApplyProgram />} />
           <Route path="/programs/:programName/:programType/:programSlug/apply/success" element={<ApplicationSuccess />} />
+          <Route path="/notifications/:programName/:programType/:programSlug/:status" element={<NotificationDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/news" element={<News />} />
