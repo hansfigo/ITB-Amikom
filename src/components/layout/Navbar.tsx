@@ -1,8 +1,9 @@
-import { ChevronDownIcon, LogOut, User } from "lucide-react";
+import { ChevronDownIcon, LogOut, User, Bell } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { NotificationPanel, Notification } from "../ui/NotificationPanel";
 
 const topNavLinks = [{ label: "Berita dan Acara", link: "/news" }, { label: "Hubungi Kami", link: "/contact" }];
 
@@ -59,10 +60,45 @@ export const Navbar = (): JSX.Element => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isQuickLinksOpen, setIsQuickLinksOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const quickLinksRef = useRef<HTMLDivElement | null>(null);
   const [quickLinksPos, setQuickLinksPos] = useState<{ left: number; top: number } | null>(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Sample notifications
+  const [notifications] = useState<Notification[]>([
+    {
+      id: "1",
+      title: "Anda terdaftar di program",
+      subtitle: "Spesialisasi Struktur Lepas Pan...",
+      date: "Kamis, 24 Juli 2024",
+      status: "registered",
+      programSlug: "struktur-lepas-pantai",
+      programName: "sarjana",
+      programType: "spesialisasi",
+    },
+    {
+      id: "2",
+      title: "Pengajuan Program Minor Fisika",
+      subtitle: "Bangunan berhasil",
+      date: "Rabu, 23 Juli 2024",
+      status: "pending",
+      programSlug: "fisika-bangunan",
+      programName: "sarjana",
+      programType: "minor",
+    },
+    {
+      id: "3",
+      title: "Pengajuan Program Minor",
+      subtitle: "Material Maju ditolak",
+      date: "Senin, 21 Juli 2024",
+      status: "rejected",
+      programSlug: "teknik-lingkungan",
+      programName: "sarjana",
+      programType: "double-major",
+    },
+  ]);
 
   const calculateQuickLinksPos = () => {
     const el = quickLinksRef.current;
@@ -154,6 +190,7 @@ export const Navbar = (): JSX.Element => {
     setIsProfileOpen(false);
     setIsQuickLinksOpen(false);
     setIsLangOpen(false);
+    setIsNotificationOpen(false);
   };
 
   const handleLogout = () => {
@@ -409,6 +446,32 @@ export const Navbar = (): JSX.Element => {
 
                 {user && (
                   <div className="inline-flex items-center justify-end gap-4">
+                    {/* Notification Bell */}
+                    <div className="relative">
+                      <button
+                        className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        onClick={() => {
+                          setIsQuickLinksOpen(false);
+                          setIsLangOpen(false);
+                          setIsProfileOpen(false);
+                          setIsProgramDropdownOpen(false);
+                          setIsAkademikOpen(false);
+                          setIsKemahasiswaanOpen(false);
+                          setIsNotificationOpen(!isNotificationOpen);
+                        }}
+                      >
+                        <Bell className="w-6 h-6 text-gray-700" />
+                        {notifications.length > 0 && (
+                          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+                        )}
+                      </button>
+                      <NotificationPanel
+                        open={isNotificationOpen}
+                        notifications={notifications}
+                        onClose={() => setIsNotificationOpen(false)}
+                      />
+                    </div>
+
                     {/* Profile Section */}
                     <div className="relative">
                       <button className="flex items-center gap-3 hover:opacity-80 transition-opacity" onClick={() => {
@@ -466,7 +529,7 @@ export const Navbar = (): JSX.Element => {
 
       {/* Overlay to close dropdown when clicking outside */}
       {
-        (isProgramDropdownOpen || isAkademikOpen || isKemahasiswaanOpen || isProfileOpen || isQuickLinksOpen || isLangOpen) && (
+        (isProgramDropdownOpen || isAkademikOpen || isKemahasiswaanOpen || isProfileOpen || isQuickLinksOpen || isLangOpen || isNotificationOpen) && (
           <div
             className="fixed inset-0 z-40"
             onClick={() => closeAll()}
