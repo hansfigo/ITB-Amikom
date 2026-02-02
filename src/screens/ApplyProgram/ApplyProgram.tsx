@@ -7,33 +7,34 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { saveApplication } from "../../lib/applicationStorage";
+import ConfirmModal from "../../components/ui/ConfirmModal";
 
 // Import program details from ProgramDetail
 const programDetails: Record<string, any> = {
-	"struktur-lepas-pantai": {
-		degree: "Sarjana",
-		type: "Program Spesialisasi",
-		faculty: "FTSL / Teknik Kelautan",
-		title: "Struktur Lepas Pantai",
-	},
-	"fisika-bangunan": {
-		degree: "Sarjana",
-		type: "Program Minor",
-		faculty: "FTI / Teknik Fisika",
-		title: "Fisika Bangunan",
-	},
-	"teknik-lingkungan": {
-		degree: "Sarjana",
-		type: "Program Double Major",
-		faculty: "FTI / Teknik Lingkungan",
-		title: "Teknik Lingkungan",
-	},
-	"pariwisata-hayati-berkelanjutan": {
-		degree: "Magister",
-		type: "Program Multidisiplin",
-		faculty: "SAPPK/Perencanaan Kepariwisataan • SITH / Biomanajemen",
-		title: "Pariwisata Hayati Berkelanjutan",
-	},
+  "struktur-lepas-pantai": {
+    degree: "Sarjana",
+    type: "Program Spesialisasi",
+    faculty: "FTSL / Teknik Kelautan",
+    title: "Struktur Lepas Pantai",
+  },
+  "fisika-bangunan": {
+    degree: "Sarjana",
+    type: "Program Minor",
+    faculty: "FTI / Teknik Fisika",
+    title: "Fisika Bangunan",
+  },
+  "teknik-lingkungan": {
+    degree: "Sarjana",
+    type: "Program Double Major",
+    faculty: "FTI / Teknik Lingkungan",
+    title: "Teknik Lingkungan",
+  },
+  "pariwisata-hayati-berkelanjutan": {
+    degree: "Magister",
+    type: "Program Multidisiplin",
+    faculty: "SAPPK/Perencanaan Kepariwisataan • SITH / Biomanajemen",
+    title: "Pariwisata Hayati Berkelanjutan",
+  },
 };
 
 export const ApplyProgram = (): JSX.Element => {
@@ -43,8 +44,14 @@ export const ApplyProgram = (): JSX.Element => {
   
   const detail = programDetails[programSlug ?? ""];
   
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const handleSubmit = () => {
-    if (!programSlug || !programName || !programType || !detail) return;
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = () => {
+    if (!programSlug || !programName || !programType || !detail) return setConfirmOpen(false);
     
     // Save to localStorage
     saveApplication({
@@ -56,7 +63,8 @@ export const ApplyProgram = (): JSX.Element => {
       faculty: detail.faculty,
       motivationLetter: motivation,
     });
-    
+
+    setConfirmOpen(false);
     // Navigate to success page
     navigate(`/programs/${programName}/${programType}/${programSlug}/apply/success`);
   };
@@ -176,6 +184,7 @@ export const ApplyProgram = (): JSX.Element => {
           </div>
         </div>
       </div>
+      <ConfirmModal open={confirmOpen} onConfirm={handleConfirm} onCancel={() => setConfirmOpen(false)} />
     </MainLayout>
   );
 };
